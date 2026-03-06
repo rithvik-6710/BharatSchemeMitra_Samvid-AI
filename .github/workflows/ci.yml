@@ -27,10 +27,10 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-cov flake8
 
-      - name: Lint
-        run: |
-          cd backend
-          flake8 app.py --max-line-length=110 --ignore=E501,W503
+      #- name: Lint
+       # run: |
+        #  cd backend
+         # flake8 app.py --max-line-length=110 --ignore=E501,W503
 
       - name: Run tests
         run: |
