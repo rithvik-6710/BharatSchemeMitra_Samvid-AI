@@ -438,9 +438,9 @@ def translate_batch(texts: list, source: str, target: str) -> list:
 
         # Ensure we have the same number of results
         if len(result) != len(texts):
-            app.logger.warning(f"⚠️ Batch translation mismatch: {
-                    len(texts)} inputs, {
-                    len(result)} outputs")
+            app.logger.warning(
+                f"⚠️ Batch translation mismatch: {len(texts)} inputs, {len(result)} outputs"
+            )
             return texts
 
         return result
