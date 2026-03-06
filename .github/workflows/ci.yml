@@ -70,8 +70,9 @@ jobs:
 
       - name: Check IndicTrans2 syntax
         run: |
-          cd backend
-          python -m py_compile indictrans2_server.py
+          cd indictrans2_server
+          python -m py_compile server.py
+          echo "✅ IndicTrans2 server.py syntax OK"
 
   deploy-to-aws:
     name: Deploy to AWS (ap-south-1)
