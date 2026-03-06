@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- Enhanced Ashoka Chakra - Indian Government Emblem -->
+  <defs>
+    <radialGradient id="chakraGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#000080;stop-opacity:0.12" />
+      <stop offset="70%" style="stop-color:#000080;stop-opacity:0.06" />
+      <stop offset="100%" style="stop-color:#000080;stop-opacity:0.02" />
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="150" cy="150" r="140" fill="url(#chakraGrad)" opacity="0.3"/>
+  
+  <!-- Outer Circle -->
+  <circle cx="150" cy="150" r="120" fill="none" stroke="#000080" stroke-width="3" opacity="0.15"/>
+  
+  <!-- Inner Circle -->
+  <circle cx="150" cy="150" r="95" fill="none" stroke="#000080" stroke-width="2" opacity="0.12"/>
+  
+  <!-- 24 Spokes of Ashoka Chakra -->
+  <g stroke="#000080" stroke-width="2.5" stroke-linecap="round" opacity="0.1" filter="url(#glow)">
+    <!-- Main 4 spokes -->
+    <line x1="150" y1="30" x2="150" y2="270" />
+    <line x1="30" y1="150" x2="270" y2="150" />
+    
+    <!-- Diagonal spokes -->
+    <line x1="57.57" y1="57.57" x2="242.43" y2="242.43" />
+    <line x1="242.43" y1="57.57" x2="57.57" y2="242.43" />
+    
+    <!-- 8 intermediate spokes -->
+    <line x1="42.93" y1="92.93" x2="257.07" y2="207.07" />
+    <line x1="257.07" y1="92.93" x2="42.93" y2="207.07" />
+    <line x1="92.93" y1="42.93" x2="207.07" y2="257.07" />
+    <line x1="207.07" y1="42.93" x2="92.93" y2="257.07" />
+    
+    <!-- 8 more intermediate spokes -->
+    <line x1="30" y1="105" x2="270" y2="195" />
+    <line x1="270" y1="105" x2="30" y2="195" />
+    <line x1="105" y1="30" x2="195" y2="270" />
+    <line x1="195" y1="30" x2="105" y2="270" />
+    
+    <!-- Final 4 spokes -->
+    <line x1="42.93" y1="120" x2="257.07" y2="180" />
+    <line x1="257.07" y1="120" x2="42.93" y2="180" />
+    <line x1="120" y1="42.93" x2="180" y2="257.07" />
+    <line x1="180" y1="42.93" x2="120" y2="257.07" />
+  </g>
+  
+  <!-- Center Circle -->
+  <circle cx="150" cy="150" r="20" fill="#000080" opacity="0.08"/>
+  <circle cx="150" cy="150" r="15" fill="none" stroke="#000080" stroke-width="2" opacity="0.12"/>
+  
+  <!-- Government of India Text (Top) -->
+  <text x="150" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="600" fill="#000080" opacity="0.15">
+    Government of India
+  </text>
+  
+  <!-- Hindi Text (Bottom) -->
+  <text x="150" y="285" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#000080" opacity="0.15">
+    भारत सरकार
+  </text>
+  
+  <!-- Satyameva Jayate (Truth Alone Triumphs) -->
+  <text x="150" y="295" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-style="italic" fill="#138808" opacity="0.12">
+    सत्यमेव जयते
+  </text>
+</svg>

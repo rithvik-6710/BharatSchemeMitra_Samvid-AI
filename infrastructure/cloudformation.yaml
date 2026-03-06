@@ -1,0 +1,156 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Bharat Scheme Mitra v2.0 — AI Multilingual Welfare Assistant
+  Infrastructure: DynamoDB, S3, IAM Role, Secrets
+  Translation: IndicTrans2 on EC2 (no BHASHINI dependency)
+  Region: ap-south-1 (Mumbai)
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, prod]
+  IndicTrans2EC2IP:
+    Type: String
+    Description: Public IP of your EC2 running IndicTrans2 server
+    Default: "1.2.3.4"
+
+Resources:
+
+  # ── DynamoDB ─────────────────────────────────────────────────
+  SessionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: welfare-sessions
+      AttributeDefinitions:
+        - { AttributeName: sessionId, AttributeType: S }
+      KeySchema:
+        - { AttributeName: sessionId, KeyType: HASH }
+      BillingMode: PAY_PER_REQUEST
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      SSESpecification:
+        SSEEnabled: true
+
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: welfare-users
+      AttributeDefinitions:
+        - { AttributeName: userId, AttributeType: S }
+      KeySchema:
+        - { AttributeName: userId, KeyType: HASH }
+      BillingMode: PAY_PER_REQUEST
+      SSESpecification:
+        SSEEnabled: true
+
+  SchemesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: welfare-schemes
+      AttributeDefinitions:
+        - { AttributeName: schemeId, AttributeType: S }
+        - { AttributeName: category, AttributeType: S }
+      KeySchema:
+        - { AttributeName: schemeId, KeyType: HASH }
+        - { AttributeName: category, KeyType: RANGE }
+      BillingMode: PAY_PER_REQUEST
+      GlobalSecondaryIndexes:
+        - IndexName: category-index
+          KeySchema:
+            - { AttributeName: category, KeyType: HASH }
+          Projection:
+            ProjectionType: ALL
+
+  # ── S3 Bucket ────────────────────────────────────────────────
+  DocumentsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub welfare-docs-${AWS::AccountId}-2026
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteAudioAfter1Day
+            Status: Enabled
+            Prefix: audio/
+            ExpirationInDays: 1
+
+  # ── IAM Role for Backend ─────────────────────────────────────
+  BackendRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: bharat-scheme-mitra-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: Bharat Scheme MitraBackendPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: [bedrock:InvokeModel]
+                Resource:
+                  - arn:aws:bedrock:ap-south-1::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0
+                  - arn:aws:bedrock:ap-south-1::foundation-model/amazon.titan-embed-text-v1
+              - Effect: Allow
+                Action: [dynamodb:GetItem, dynamodb:PutItem, dynamodb:UpdateItem, dynamodb:Query, dynamodb:Scan]
+                Resource:
+                  - !GetAtt SessionsTable.Arn
+                  - !GetAtt UsersTable.Arn
+                  - !GetAtt SchemesTable.Arn
+                  - !Sub ${SchemesTable.Arn}/index/*
+              - Effect: Allow
+                Action: [s3:PutObject, s3:GetObject, s3:DeleteObject]
+                Resource: !Sub ${DocumentsBucket.Arn}/*
+              - Effect: Allow
+                Action: [transcribe:StartTranscriptionJob, transcribe:GetTranscriptionJob]
+                Resource: '*'
+              - Effect: Allow
+                Action: [polly:SynthesizeSpeech]
+                Resource: '*'
+              - Effect: Allow
+                Action: [textract:DetectDocumentText, textract:AnalyzeDocument]
+                Resource: '*'
+              - Effect: Allow
+                Action: [logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEvents]
+                Resource: arn:aws:logs:*:*:*
+
+  # ── Secrets Manager ───────────────────────────────────────────
+  IndicTrans2Secret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: bharat-scheme-mitra/indictrans2-url
+      Description: IndicTrans2 EC2 server URL (no BHASHINI needed)
+      SecretString: !Sub '{"url": "http://${IndicTrans2EC2IP}:5001"}'
+
+  # ── CloudWatch Log Group ──────────────────────────────────────
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /bharat-scheme-mitra/backend
+      RetentionInDays: 30
+
+Outputs:
+  BucketName:
+    Value: !Ref DocumentsBucket
+    Description: S3 bucket for documents and audio
+  SessionsTableName:
+    Value: !Ref SessionsTable
+  SchemesTableName:
+    Value: !Ref SchemesTable
+  BackendRoleArn:
+    Value: !GetAtt BackendRole.Arn

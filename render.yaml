@@ -1,0 +1,46 @@
+services:
+  # Backend Service
+  - type: web
+    name: bharat-scheme-backend
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && gunicorn app:app --bind 0.0.0.0:$PORT"
+    healthCheckPath: /health
+    envVars:
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_DEFAULT_REGION
+        value: ap-south-1
+      - key: S3_BUCKET
+        value: welfare-docs-843374720127-2026
+      - key: SESSIONS_TABLE
+        value: user-sessions
+      - key: USERS_TABLE
+        value: user-profiles
+      - key: SCHEMES_CACHE_TABLE
+        value: schemeuser
+      - key: PYTHON_VERSION
+        value: 3.11.0
+
+  # Frontend Service
+  - type: web
+    name: bharat-scheme-frontend
+    env: static
+    region: singapore
+    plan: free
+    buildCommand: "cd frontend && npm install && REACT_APP_API_URL=$BACKEND_URL npm run build"
+    staticPublishPath: frontend/build
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: bharat-scheme-backend
+          envVarKey: RENDER_EXTERNAL_URL

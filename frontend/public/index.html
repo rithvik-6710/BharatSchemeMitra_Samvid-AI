@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="hi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="theme-color" content="#FF6B00" />
+    <meta name="description" content="Bharat Scheme Mitra – AI-powered multilingual government welfare scheme assistant for Indian citizens" />
+    <meta name="keywords" content="government schemes, welfare, PM-KISAN, Ayushman Bharat, India, multilingual, AI" />
+    <meta name="author" content="Bharat Scheme Mitra" />
+    <meta property="og:title" content="Bharat Scheme Mitra – AI Government Welfare Assistant" />
+    <meta property="og:description" content="Discover government welfare schemes you are eligible for in your own language" />
+    <meta property="og:type" content="website" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <title>Bharat Scheme Mitra – AI Government Welfare Assistant</title>
+
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #0f0f0f;
+        color: #eee;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* ── Splash / Loading Screen ── */
+      #splash {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(160deg, #0f0f1a 0%, #1a0a00 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        z-index: 9999;
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+      #splash.fade-out {
+        opacity: 0;
+        transform: scale(1.03);
+        pointer-events: none;
+      }
+      .splash-flag {
+        font-size: 56px;
+        animation: float 2s ease-in-out infinite;
+        filter: drop-shadow(0 0 20px rgba(255,107,0,0.5));
+      }
+      .splash-title {
+        font-size: 26px;
+        font-weight: 800;
+        color: #FF6B00;
+        letter-spacing: -0.5px;
+      }
+      .splash-sub {
+        font-size: 13px;
+        color: #555;
+        text-align: center;
+        line-height: 1.6;
+        max-width: 260px;
+      }
+      .splash-langs {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 280px;
+        opacity: 0.6;
+      }
+      .splash-lang {
+        font-size: 12px;
+        color: #888;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        padding: 3px 10px;
+        border-radius: 20px;
+      }
+      .splash-dots {
+        display: flex;
+        gap: 7px;
+        margin-top: 6px;
+      }
+      .splash-dot {
+        width: 9px; height: 9px;
+        background: #FF6B00;
+        border-radius: 50%;
+        animation: bounce 1.3s ease-in-out infinite;
+      }
+      .splash-dot:nth-child(2) { animation-delay: 0.18s; background: #FF8C00; }
+      .splash-dot:nth-child(3) { animation-delay: 0.36s; background: #FFA040; }
+
+      .splash-powered {
+        font-size: 10px;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 10px;
+      }
+      .splash-powered span { color: #FF6B00; font-weight: 600; }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+      }
+      @keyframes bounce {
+        0%, 80%, 100% { transform: scale(0.5); opacity: 0.3; }
+        40% { transform: scale(1.2); opacity: 1; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <noscript>
+      <div style="text-align:center;padding:60px 20px;font-family:sans-serif;background:#0f0f0f;color:#eee;min-height:100vh;">
+        <h2 style="color:#FF6B00;">🇮🇳 Bharat Scheme Mitra</h2>
+        <p>JavaScript is required to run this application.<br/>Please enable JavaScript in your browser settings.</p>
+      </div>
+    </noscript>
+
+    <!-- Splash Screen -->
+    <div id="splash">
+      <div class="splash-flag">🇮🇳</div>
+      <div class="splash-title">Bharat Scheme Mitra</div>
+      <div class="splash-sub">AI Welfare Assistant · Voice-enabled · Multilingual</div>
+      <div class="splash-langs">
+        <span class="splash-lang">हिंदी</span>
+        <span class="splash-lang">English</span>
+        <span class="splash-lang">தமிழ்</span>
+        <span class="splash-lang">తెలుగు</span>
+        <span class="splash-lang">বাংলা</span>
+        <span class="splash-lang">ಕನ್ನಡ</span>
+        <span class="splash-lang">മലയാളം</span>
+        <span class="splash-lang">ગુજરાતી</span>
+      </div>
+      <div class="splash-dots">
+        <div class="splash-dot"></div>
+        <div class="splash-dot"></div>
+        <div class="splash-dot"></div>
+      </div>
+      <div class="splash-powered">Powered by <span>Amazon Bedrock</span> · <span>AWS AI</span></div>
+    </div>
+
+    <!-- React App Root -->
+    <div id="root"></div>
+
+    <script>
+      // Hide splash once React has rendered
+      (function() {
+        var removed = false;
+        function hideSplash() {
+          if (removed) return;
+          removed = true;
+          var splash = document.getElementById('splash');
+          if (!splash) return;
+          splash.classList.add('fade-out');
+          setTimeout(function() { splash && splash.remove(); }, 600);
+        }
+        // Observe #root for first child (React mount)
+        var observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(m) {
+            if (m.addedNodes.length > 0) { hideSplash(); observer.disconnect(); }
+          });
+        });
+        var root = document.getElementById('root');
+        if (root) observer.observe(root, { childList: true });
+        // Fallback — hide after 3 seconds no matter what
+        setTimeout(hideSplash, 3000);
+      })();
+    </script>
+  </body>
+</html>

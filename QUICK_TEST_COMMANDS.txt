@@ -1,0 +1,48 @@
+=== QUICK TEST COMMANDS ===
+
+1. START BACKEND:
+   cd backend
+   python app.py
+
+2. TEST HEALTH (new terminal):
+   curl http://localhost:5000/health
+
+3. TEST TRANSLATION:
+   curl -X POST http://localhost:5000/translate -H "Content-Type: application/json" -d "{\"text\":\"Hello\",\"source\":\"en\",\"target\":\"hi\"}"
+
+4. TEST CHAT:
+   curl -X POST http://localhost:5000/chat -H "Content-Type: application/json" -d "{\"message\":\"I am a farmer\",\"language\":\"en\"}"
+
+5. START FRONTEND (new terminal):
+   cd frontend
+   npm start
+
+6. OPEN BROWSER:
+   http://localhost:3000
+
+=== EXPECTED RESULTS ===
+
+Health Check:
+✅ status: "ok"
+✅ translation: "Amazon Translate (AWS Native)"
+✅ aws_services: 9 services listed
+
+Translation:
+✅ translated: "नमस्ते" (Hindi text)
+
+Chat:
+✅ reply with conversational response
+✅ intent: "profile_collection"
+✅ user_profile: {"occupation": "farmer"}
+
+Frontend:
+✅ UI loads
+✅ No console errors
+✅ Chat works
+✅ Voice works
+✅ TTS works
+
+=== IF ALL PASS ===
+You're ready to deploy! 🚀
+
+See DEPLOYMENT_READY.md for deployment steps.
