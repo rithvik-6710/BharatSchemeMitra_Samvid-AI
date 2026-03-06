@@ -621,8 +621,9 @@ def get_conversational_reply(user_message: str, session_id: str, language: str) 
     context = session_data["context"]
     flow_state = session_data.get("flow_state", {})
 
-    app.logger.info(f"📚 Session history: {
-            len(history)} messages | Profile: {user_profile}")
+    app.logger.info(
+        f"📚 Session history: {len(history)} messages | Profile: {user_profile}"
+    )
 
     # Initialize or load conversation flow controller
     flow_controller = ConversationFlowController()
@@ -639,8 +640,9 @@ def get_conversational_reply(user_message: str, session_id: str, language: str) 
     intent = intent_data["intent"]
     entities = intent_data["entities"]
 
-    app.logger.info(f"🎯 Intent detected: {
-            intent.value} | Entities: {entities}")
+    app.logger.info(
+        f"🎯 Intent detected: {intent.value} | Entities: {entities}"
+    )
 
     # Check sentiment
     sentiment = analyze_sentiment_comprehend(user_message, language)
@@ -674,11 +676,10 @@ def get_conversational_reply(user_message: str, session_id: str, language: str) 
     if not short_history:
         short_history = [{"role": "user", "content": reasoning_input}]
 
-    app.logger.info(f"🤖 Calling AI with {
-            len(short_history)} messages | Intent: {
-            intent.value}")
-    app.logger.info(f"📋 First message role: {
-            short_history[0]['role']}")  # Debug log
+    app.logger.info(
+        f"🤖 Calling AI with {len(short_history)} messages | Intent: {intent.value}"
+    )
+    app.logger.info(f"📋 First message role: {short_history[0]['role']}")  # Debug log
 
     # Get AI response
     try:
@@ -692,10 +693,8 @@ def get_conversational_reply(user_message: str, session_id: str, language: str) 
 
     # Parse response
     response_data = parse_ai_response(raw_response, intent, language, entities)
-    app.logger.info(f"📦 Parsed response type: {
-            response_data.get('type') if isinstance(
-                response_data,
-                dict) else type(response_data)}")
+    response_type = response_data.get('type') if isinstance(response_data, dict) else type(response_data)
+    app.logger.info(f"📦 Parsed response type: {response_type}")
 
     # TRANSLATE RESPONSE TO TARGET LANGUAGE
     if language != "en" and isinstance(response_data, dict):
@@ -1424,10 +1423,9 @@ def chat():
 
         result = get_conversational_reply(user_message, session_id, language)
 
-        app.logger.info(f"✅ Chat response: intent={
-                result.get('intent')}, reply_type={
-                type(
-                    result.get('reply'))}")
+        intent_value = result.get('intent')
+        reply_type = type(result.get('reply'))
+        app.logger.info(f"✅ Chat response: intent={intent_value}, reply_type={reply_type}")
 
         return jsonify({"sessionId": session_id, **result})
 
@@ -1739,9 +1737,9 @@ def voice_chat():
         # Poll for completion with language-aware timeout
         # Fully supported Indic languages may take longer to transcribe
         max_attempts = 30 if language in TRANSCRIBE_SUPPORTED else 20
+        max_wait_time = max_attempts * 2
         app.logger.info(
-            f"🎯 Transcribing in {language} ({transcribe_lang}) - max wait: {
-                max_attempts * 2}s | Fallback: {is_fallback}"
+            f"🎯 Transcribing in {language} ({transcribe_lang}) - max wait: {max_wait_time}s | Fallback: {is_fallback}"
         )
 
         for attempt in range(max_attempts):
@@ -1752,8 +1750,7 @@ def voice_chat():
                 status = job["TranscriptionJob"]["TranscriptionJobStatus"]
 
                 app.logger.info(
-                    f"📊 Transcription status (attempt {
-                        attempt + 1}/{max_attempts}): {status} | Language: {transcribe_lang}"
+                    f"📊 Transcription status (attempt {attempt + 1}/{max_attempts}): {status} | Language: {transcribe_lang}"
                 )
 
                 if status == "COMPLETED":
@@ -1764,11 +1761,8 @@ def voice_chat():
                     # Extract transcript text
                     transcripts = result.get("results", {}).get("transcripts", [])
                     app.logger.info(f"📝 Transcription result: {transcripts}")
-                    app.logger.info(f"🔍 Full transcription response: {
-                            json.dumps(
-                                result,
-                                ensure_ascii=False)[
-                                :500]}")
+                    full_response = json.dumps(result, ensure_ascii=False)[:500]
+                    app.logger.info(f"🔍 Full transcription response: {full_response}")
 
                     if not transcripts or not transcripts[0].get("transcript"):
                         app.logger.warning(
@@ -1789,11 +1783,9 @@ def voice_chat():
 
                     # If using fallback, add a note for the user
                     if is_fallback:
+                        lang_name = LANG_NAME.get(language, language)
                         app.logger.info(
-                            f"ℹ️ Using English transcription for {
-                                LANG_NAME.get(
-                                    language,
-                                    language)} - user should speak in English or use text input"
+                            f"ℹ️ Using English transcription for {lang_name} - user should speak in English or use text input"
                         )
 
                     # Use enhanced conversational reply
@@ -1862,16 +1854,16 @@ def voice_chat():
                     )
 
         # Timeout
-        app.logger.error(f"⏱️ Transcription timed out after {
-                max_attempts *
-                2} seconds | Language: {transcribe_lang} | Job: {job_name}")
+        timeout_seconds = max_attempts * 2
+        app.logger.error(
+            f"⏱️ Transcription timed out after {timeout_seconds} seconds | Language: {transcribe_lang} | Job: {job_name}"
+        )
+        lang_name = LANG_NAME.get(language, language)
         return (
             jsonify(
                 {
                     "error": "Voice processing timed out",
-                    "tip": f"Audio transcription is taking longer than expected for {
-                    LANG_NAME.get(
-                        language, language)}. Try: 1) Speaking for 2-5 seconds, 2) Speaking clearly and slowly, 3) Using text input instead.",
+                    "tip": f"Audio transcription is taking longer than expected for {lang_name}. Try: 1) Speaking for 2-5 seconds, 2) Speaking clearly and slowly, 3) Using text input instead.",
                 }
             ),
             500,
