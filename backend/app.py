@@ -2006,7 +2006,11 @@ def upload_doc():
         return jsonify({"error": "File too large. Maximum 5MB allowed."}), 413
     doc_file.seek(0)
 
-    s3_key = f"docs/uploads/{doc_type}/{uuid.uuid4().hex}.jpg"
+    # Get original file extension
+    original_filename = doc_file.filename
+    file_ext = original_filename.rsplit('.', 1)[1].lower() if '.' in original_filename else 'jpg'
+
+    s3_key = f"docs/uploads/{doc_type}/{uuid.uuid4().hex}.{file_ext}"
     s3_client.upload_fileobj(doc_file, S3_BUCKET, s3_key)
 
     try:
